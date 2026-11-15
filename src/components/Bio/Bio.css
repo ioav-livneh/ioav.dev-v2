@@ -100,11 +100,35 @@
        between 11rem and 15rem */
     --term-size: clamp(11rem, 22vw, 15rem);
     --term-gap: calc(var(--term-size) * 0.04);
+    /* How deep the terminal looks when tilted, and how many slices make up the
+       edge (must match EDGE_SLICES in Bio.js) */
+    --term-depth: calc(var(--term-size) * 0.07);
+    --term-slices: 12;
     flex-shrink: 0;
     transform-style: preserve-3d;
     perspective: 102rem;
     z-index: 3;
 
+}
+
+/* The part that tilts. preserve-3d lets the edge slices sit at real depths
+   behind the screen (.mini-terminal itself can't, since overflow: hidden
+   flattens 3D). */
+.mini-terminal-body {
+    position: relative;
+    width: var(--term-size);
+    height: var(--term-size);
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.mini-terminal-edge > div {
+    position: absolute;
+    inset: 0;
+    border-radius: 1rem;
+    /* Each slice steps further back and a little darker */
+    transform: translateZ(calc(var(--term-depth) * var(--i) / var(--term-slices) * -1));
+    background: color-mix(in srgb, var(--color2-text), black calc(45% + var(--i) * 2.5%));
 }
 
 .mini-terminal {
@@ -121,7 +145,9 @@
     padding: var(--term-gap);
     overflow: hidden;
     position: relative;
-    will-change: transform;
+    /* Own stacking context, so .screen-overlay's z-index: -1 (which carries the
+       text) stays in front of this black background */
+    z-index: 0;
 }
 
 .terminal-wrapper-content {
@@ -153,12 +179,14 @@
   }
 
   .screen-overlay {    
-    background: linear-gradient(
+    /* Kept in a variable so the boot sequence can switch the scanlines off and on */
+    --scanlines: linear-gradient(
         var(--secondary-bg-inverse),
         var(--secondary-bg-inverse) 3px,
       transparent 3px,
       transparent 9px
     );
+    background-image: var(--scanlines);
     background-size: 100% 9px;
     min-height: 100%;
     width: 100%;
@@ -168,6 +196,33 @@
     left: 0px;
     top: 0px;
   }
+
+/* Boot sequence (phases set in Bio.js) */
+.mini-terminal.is-booting .terminal-content {
+  visibility: hidden;
+}
+
+.mini-terminal.is-booting .screen-overlay,
+.mini-terminal.is-typing .screen-overlay {
+  background-image: none;
+}
+
+.mini-terminal.is-flicker .screen-overlay {
+  animation: pan-overlay 0.3s infinite linear,
+    scanlines-flicker 0.7s step-end;
+}
+
+/* step-end holds each value until the next keyframe, giving hard on/off cuts */
+@keyframes scanlines-flicker {
+  0%   { background-image: var(--scanlines); }
+  8%   { background-image: none; }
+  18%  { background-image: var(--scanlines); }
+  26%  { background-image: none; }
+  44%  { background-image: var(--scanlines); }
+  52%  { background-image: none; }
+  64%  { background-image: var(--scanlines); }
+  100% { background-image: var(--scanlines); }
+}
 
 .Bio-body {
   display: flex;

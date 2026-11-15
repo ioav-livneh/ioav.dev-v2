@@ -1,0 +1,94 @@
+const TYPING_MIN_SPEED = 0.25; // characters per ms (250/s)
+const TYPING_MAX_DURATION = 800; // ms; long output speeds up to finish within this
+const SCRAMBLE_AHEAD = 40; // characters of shuffling symbols shown ahead of the settled text
+const SCRAMBLE_GLYPHS = "!#$%&*+-=?@^_~[]{}|/\\§±•x";
+
+// Random symbols for each non-space character, so the band keeps the real text's word shapes and wrapping.
+const scramble = (text) =>
+  text.replace(/\S/g, () => SCRAMBLE_GLYPHS[Math.floor(Math.random() * SCRAMBLE_GLYPHS.length)]);
+
+// Types out the given elements in place, with a band of shuffling symbols running ahead of the
+// settled text. Text nodes are emptied and refilled in reading order; text-less elements (<br>, theme
+// swatches) appear when the band reaches them. Text that isn't currently displayed (e.g. the phone
+// banner on desktop) is left alone. Returns finish(notify = true), which completes it immediately.
+// Pass `speed` (characters per ms) for a constant pace instead of fitting the output into maxDuration.
+export function typeOut(
+  lineElements,
+  onTypingChange,
+  { maxDuration = TYPING_MAX_DURATION, speed = null, followOutput = true } = {},
+) {
+  const steps = [];
+  let total = 0;
+  for (const root of lineElements) {
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+    );
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if (node.data.length > 0 && node.parentElement.getClientRects().length > 0) {
+          steps.push({ node, text: node.data, start: total });
+          total += node.data.length;
+          node.data = "";
+        }
+      } else if (node.tagName === "BR" || node.classList.contains("swatch")) {
+        steps.push({ node, start: total });
+        total += 1;
+        node.style.display = "none";
+      }
+    }
+  }
+
+  // The settled text has to travel the whole output plus the band before typing is done.
+  const charsPerMs =
+    speed ?? Math.max(TYPING_MIN_SPEED, (total + SCRAMBLE_AHEAD) / maxDuration);
+  let firstUnsettled = 0;
+  let frame = null;
+  let done = false;
+
+  const render = (settled) => {
+    const front = settled + SCRAMBLE_AHEAD;
+    for (let i = firstUnsettled; i < steps.length; i++) {
+      const step = steps[i];
+      if (step.start >= front) break; // not reached yet; still hidden
+      if (step.text) {
+        const length = step.text.length;
+        const real = Math.min(Math.max(settled - step.start, 0), length);
+        const shown = Math.min(front - step.start, length);
+        step.node.data = step.text.slice(0, real) + scramble(step.text.slice(real, shown));
+        if (real === length && i === firstUnsettled) firstUnsettled++;
+      } else {
+        step.node.style.display = "";
+        if (step.start < settled && i === firstUnsettled) firstUnsettled++;
+      }
+    }
+  };
+
+  const finish = (notify = true) => {
+    if (done) return;
+    done = true;
+    cancelAnimationFrame(frame);
+    for (const step of steps) {
+      if (step.text) step.node.data = step.text;
+      else step.node.style.display = "";
+    }
+    if (notify) onTypingChange?.(false);
+  };
+
+  const start = performance.now();
+  const tick = (now) => {
+    const settled = Math.floor((now - start) * charsPerMs);
+    if (settled >= total) {
+      finish();
+      return;
+    }
+    render(settled);
+    if (followOutput) window.scrollTo(0, document.body.offsetHeight);
+    frame = requestAnimationFrame(tick);
+  };
+
+  onTypingChange?.(true);
+  frame = requestAnimationFrame(tick);
+  return finish;
+}

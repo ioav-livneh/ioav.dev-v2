@@ -1,14 +1,66 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Bio.css";
 import { miniTerminal } from "../../commands";
+import { typeOut } from "../../utils/typeOut";
+
+// Set once the type-out has finished, so it only plays on the first page load
+// and not every time you navigate back to the home page.
+let hasTypedOut = false;
+
+const BOOT_PAUSE_MS = 1000; // blank screen before the logo starts typing
+const FLICKER_DELAY_MS = 400; // gap between the logo finishing and the scanlines flickering on
+
+// Stacked copies of the frame, each a little further back, that read as a solid
+// edge when the terminal tilts. More slices = smoother edge. Keep in sync with
+// --term-slices in Bio.css.
+const EDGE_SLICES = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const Bio = () => {
   const perspectiveRef = useRef(null);
+  const terminalContentRef = useRef(null);
+
+  // Boot sequence on first load: a short pause with a blank screen, then the
+  // ASCII logo types out, then the scanlines flicker on.
+  // "booting" → "typing" → "flicker"; "done" when it has already played.
+  const [bootPhase, setBootPhase] = useState(hasTypedOut ? "done" : "booting");
+
+  useEffect(() => {
+    if (hasTypedOut) return;
+    let finish = null;
+    let flickerTimer;
+
+    const pauseTimer = setTimeout(() => {
+      // typeOut empties the text before the next paint, so revealing the
+      // (now blank) text in the same tick doesn't flash the logo
+      finish = typeOut(
+        [terminalContentRef.current],
+        (typing) => {
+          if (typing) return;
+          hasTypedOut = true;
+          flickerTimer = setTimeout(
+            () => setBootPhase("flicker"),
+            FLICKER_DELAY_MS,
+          );
+        },
+        // Don't scroll the page to follow the output; take ~1.2s in total
+        { followOutput: false, maxDuration: 1200 },
+      );
+      setBootPhase("typing");
+    }, BOOT_PAUSE_MS);
+
+    // Restores the full text if the component unmounts mid-sequence. It doesn't
+    // mark the animation as played, so React's dev-mode double mount still shows it.
+    return () => {
+      clearTimeout(pauseTimer);
+      clearTimeout(flickerTimer);
+      finish?.(false);
+    };
+  }, []);
 
   // 3D tilt effect: mini-terminal follows the cursor, eases back to center on mouseout
   useEffect(() => {
     const wrapper = perspectiveRef.current;
-    const card = wrapper.querySelector(".mini-terminal");
+    const card = wrapper.querySelector(".mini-terminal-body");
     const tiltMultiplier = 0.1;
 
     let bounds = wrapper.getBoundingClientRect();
@@ -74,13 +126,21 @@ const Bio = () => {
             </a>
           </div>
           <div className="mini-terminal-perspective" ref={perspectiveRef}>
-            <div className="mini-terminal">
-              <div className="screen-overlay">
-                <div className="terminal-wrapper-content">
-                  <div className="terminal-content">
-                    {miniTerminal.map((line, index) => (
-                      <div key={index}>{line}</div>
-                    ))}
+            {/* Tilts as one piece: the edge slices behind give the screen depth */}
+            <div className="mini-terminal-body">
+              <div className="mini-terminal-edge" aria-hidden="true">
+                {EDGE_SLICES.map((i) => (
+                  <div key={i} style={{ "--i": i }} />
+                ))}
+              </div>
+              <div className={`mini-terminal is-${bootPhase}`}>
+                <div className="screen-overlay">
+                  <div className="terminal-wrapper-content">
+                    <div className="terminal-content" ref={terminalContentRef}>
+                      {miniTerminal.map((line, index) => (
+                        <div key={index}>{line}</div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
