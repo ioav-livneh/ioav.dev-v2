@@ -1,0 +1,101 @@
+/* Mobile-first: stacked by default, mini-terminal on top, bio-text below */
+.Bio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 6rem 1.25rem;
+}
+
+.mini-terminal-perspective {
+    flex-shrink: 0;
+    transform-style: preserve-3d;
+    perspective: 102rem;
+    z-index: 3;
+
+}
+
+.mini-terminal {
+    width: 24rem;
+    height: 24rem;
+    background-color: black;
+    border-radius: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+    white-space: pre;
+    font-family: monospace;
+    border: var(--color2-text) 3px solid;
+    border-radius: 1rem;
+    padding: 15px 15px;
+    overflow: hidden;
+    position: relative;
+    will-change: transform;
+}
+
+.terminal-wrapper-content {
+    height: calc(22rem - 6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    font-weight: bold;
+    border: 1px solid var(--main-bg-inverse);
+    border-radius: 0.6rem;
+    margin: 15px 15px;
+  }
+
+  .terminal-content {
+    font-size: 1.25rem;
+  }
+
+  @keyframes pan-overlay {
+    from {
+      background-position: 0 0;
+    }
+    
+    to {
+      background-position: 0px -9px;
+    }
+  }
+
+  .screen-overlay {    
+    background: linear-gradient(
+        var(--secondary-bg-inverse),
+        var(--secondary-bg-inverse) 3px,
+      transparent 3px,
+      transparent 9px
+    );
+    background-size: 100% 9px;
+    min-height: 100%;
+    width: 100%;
+    animation: pan-overlay 0.3s infinite linear;
+    position: absolute;
+    z-index: -1;
+    left: 0px;
+    top: 0px;
+  }
+
+
+.bio-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+    max-width: 600px;
+    width: 100%;
+}
+
+/* From here up, switch to the side-by-side layout */
+@media (min-width: 992px) {
+    .Bio {
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        gap: 0;
+        padding: 6rem 2rem;
+    }
+
+    .bio-text {
+        margin: 0 3rem;
+    }
+}

@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+
 :root{
-  --main-bg: #0F111A;
+  --main-bg: rgb(10, 30, 35);
   --main-bg-inverse: #F0EEE550;
   --secondary-bg-inverse: #F0EEE515;
   --link-hover-bg: #717CB480;
@@ -8,6 +11,10 @@
   --main-text: #EEFFFF;
   --link-text: #82AAFF;
   --color2-text: #C3E88D;
+}
+
+#root{
+  width: 100%;
 }
 
 .App {
@@ -22,43 +29,17 @@ body {
   margin: 0;
   color: var(--main-text);
   background: var(--main-bg); 
-  font-family: cursor, monospace;
+  /* font-family: cursor, monospace; */
+  font-family: "Figtree",sans-serif;
+  overflow-x: hidden;
 }
 
-  ::-webkit-scrollbar {
-    width: 0px;
-  }
-
-p {
-  line-height: 1.3em;
-  margin: 0;
-  text-wrap: wrap !important;
-  white-space: nowrap;
-  font-size: max(1.11111111vw, 16px);
-} 
-
-.color2 {
-  color: var(--color2-text);
-}
-.command {
-  color: var(--command);
-  text-shadow: 0 0 1px var(--command); 
+p{
+  z-index: 3;
+  margin-top: 0;
+  line-height: 1.625;
 }
 
-.inherit,
-a {
-  color: var(--link-text);
+nav{
+  display: none;
 }
-a {
-  text-decoration: inherit;
-  display: inline-block;
-  width: min-content;
-  white-space: nowrap;
-}
-a:hover {
-  background: var(--link-hover-bg);
-  color: var(--link-hover-text);
-}
-a:focus {
-  outline: 0;
-} 

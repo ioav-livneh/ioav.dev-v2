@@ -1,12 +1,22 @@
 import "./App.css";
-import Terminal from "./components/Terminal/Terminal";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout/Layout";
+import Home from "./pages/Home/Home";
+import Projects from "./pages/Projects/Projects";
+import Contact from "./pages/Contact/Contact";
 
 function App() {
   return (
     <div className="App">
-      <Terminal />
-      {/* Bottom right corner of screen, hide a link that pops up on hover that takes you to my old website with matrix
-      to show off ability to do mouse tracking and css animation to slide things in off the screen. */}
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="projects" element={<Projects />} />
+            <Route path="contact" element={<Contact />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
