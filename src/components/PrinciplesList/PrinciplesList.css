@@ -1,1 +1,42 @@
-.PrinciplesList {}
+.PrinciplesList-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 48px 40px;
+}
+
+.PrinciplesList-items li {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.PrinciplesList-number {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--cyan);
+}
+
+.PrinciplesList-items h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.PrinciplesList-body {
+  font-size: 16px;
+  color: var(--text-soft);
+}
+
+.PrinciplesList-source {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.PrinciplesList-source a,
+.PrinciplesList-source a:hover {
+  color: var(--text-muted);
+}

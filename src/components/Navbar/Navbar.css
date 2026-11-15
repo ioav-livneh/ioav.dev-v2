@@ -1,1 +1,43 @@
-.Navbar {}
+.Navbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.Navbar-logo {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  line-height: 1.2;
+}
+
+.Navbar-logo-name {
+  color: var(--cyan);
+}
+
+.Navbar-logo-tld {
+  color: var(--accent);
+}
+
+.Navbar-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.Navbar-links a {
+  text-decoration: none;
+  padding: 12px 0;
+}

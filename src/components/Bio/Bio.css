@@ -1,13 +1,105 @@
-/* Mobile-first: stacked by default, mini-terminal on top, bio-text below */
+/* Hero: headline + mini terminal on top, bio + links below */
 .Bio {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 6rem 1.25rem;
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 88px 0 96px;
+}
+
+/* Headline and terminal side by side; the terminal wraps below, centred,
+   once there's no room for both */
+.Bio-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+}
+
+.Bio-heading {
+  flex: 1 1 26rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.Bio-kicker {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.Bio-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 4.6vw, 3.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+/* Holds the terminal plus the hidden "Visit v1" button to its left */
+.Bio-terminal {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Bio-v1 {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  right: 100%;
+  top: 50%;
+  height: 100%;
+  translate: 0 -50%;
+  padding-right: 20px;
+  z-index: 4;
+  opacity: 0;
+  /* Invisible and unclickable until revealed, but still reachable with Tab */
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.Bio-terminal:hover .Bio-v1,
+.Bio-terminal:focus-within .Bio-v1 {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.Bio-v1-link {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--accent);
+  background: var(--bg);
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  padding: 10px 16px;
+}
+
+.Bio-v1-link:hover {
+  color: var(--bg);
+  background: var(--accent);
+}
+
+/* Keeps the terminal's own text as it was, whatever the page typography is */
+.mini-terminal {
+  color: var(--main-text);
+  line-height: normal;
 }
 
 .mini-terminal-perspective {
+    /* One size drives the whole terminal: it shrinks with the window,
+       between 11rem and 15rem */
+    --term-size: clamp(11rem, 22vw, 15rem);
+    --term-gap: calc(var(--term-size) * 0.04);
     flex-shrink: 0;
     transform-style: preserve-3d;
     perspective: 102rem;
@@ -16,8 +108,8 @@
 }
 
 .mini-terminal {
-    width: 24rem;
-    height: 24rem;
+    width: var(--term-size);
+    height: var(--term-size);
     background-color: black;
     border-radius: 15px;
     padding: 10px;
@@ -26,14 +118,15 @@
     font-family: monospace;
     border: var(--color2-text) 3px solid;
     border-radius: 1rem;
-    padding: 15px 15px;
+    padding: var(--term-gap);
     overflow: hidden;
     position: relative;
     will-change: transform;
 }
 
 .terminal-wrapper-content {
-    height: calc(22rem - 6px);
+    /* Terminal size minus its 3px borders, this box's 1px borders and margins */
+    height: calc(var(--term-size) - 8px - 2 * var(--term-gap));
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,11 +134,12 @@
     font-weight: bold;
     border: 1px solid var(--main-bg-inverse);
     border-radius: 0.6rem;
-    margin: 15px 15px;
+    margin: var(--term-gap);
   }
 
   .terminal-content {
-    font-size: 1.25rem;
+    /* Scales with the terminal so the ASCII logo always fits */
+    font-size: calc(var(--term-size) * 0.048);
   }
 
   @keyframes pan-overlay {
@@ -75,27 +169,70 @@
     top: 0px;
   }
 
-
-.bio-text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin: 0;
-    max-width: 600px;
-    width: 100%;
+.Bio-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px 72px;
 }
 
-/* From here up, switch to the side-by-side layout */
-@media (min-width: 992px) {
-    .Bio {
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        gap: 0;
-        padding: 6rem 2rem;
-    }
+.bio-text {
+  flex: 999 1 520px;
+  min-width: 0;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--text-soft);
+}
 
-    .bio-text {
-        margin: 0 3rem;
-    }
+.bio-text-strong {
+  font-weight: 600;
+}
+
+.Bio-elsewhere {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.Bio-elsewhere-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.Bio-elsewhere-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.Bio-elsewhere-links a {
+  padding: 8px 0;
+}
+
+.Bio-resume {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 18px;
+}
+
+/* CSS can't detect a wrap, so this breakpoint matches it: the headline (26rem)
+   + gap (48px) + smallest terminal (11rem) + page padding (64px) ≈ 704px.
+   Hiding at 720px removes the terminal just before it would drop below the
+   headline. If you change any of those sizes, update this value too. */
+@media (max-width: 720px) {
+  .Bio-terminal {
+    display: none;
+  }
 }

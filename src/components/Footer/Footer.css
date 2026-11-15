@@ -1,1 +1,25 @@
-.Footer {}
+.Footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 32px;
+  padding: 28px 0 40px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.Footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+}
+
+.Footer-links a,
+.Footer-links a:hover {
+  color: var(--text-muted);
+  padding: 12px 0;
+}

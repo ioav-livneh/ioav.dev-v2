@@ -1,1 +1,28 @@
-.FeaturedProjects {}
+.FeaturedProjects-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.FeaturedProjects-next-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.FeaturedProjects-next-text {
+  flex: 1 1 320px;
+  color: var(--text-soft);
+}
+
+.FeaturedProjects-next-text strong {
+  color: var(--text);
+  font-weight: 600;
+}

@@ -1,1 +1,26 @@
-.ContactSection {}
+.ContactSection.section {
+  padding: 96px 0;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.ContactSection-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.ContactSection-text {
+  max-width: 520px;
+  color: var(--text-soft);
+}
+
+.ContactSection-email {
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  color: var(--accent);
+  padding: 12px 0;
+  overflow-wrap: anywhere;
+}
