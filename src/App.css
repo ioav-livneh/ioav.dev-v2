@@ -15,10 +15,17 @@
   --font-display: "Space Grotesk", Inter, sans-serif;
 
   /* Used by the mini terminal */
-  --main-bg-inverse: #F0EEE550;
-  --secondary-bg-inverse: #F0EEE515;
+  --main-bg-inverse: #f0eee529;
+  --secondary-bg-inverse: #f0eee538;
   --main-text: #EEFFFF;
-  --color2-text: #C3E88D;
+  --color2-text: var(--accent); 
+  /* --color2-text: #C3E88D; */
+}
+
+/* In-page links (#work, #ideas…) stop below the sticky navbar instead of
+   behind it. Matches the navbar's height: 28px padding × 2 + 44px logo. */
+html {
+  scroll-padding-top: 100px;
 }
 
 #root {

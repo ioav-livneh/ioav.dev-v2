@@ -4,7 +4,6 @@ import "./PrinciplesList.css";
 const PrinciplesList = () => (
   <section id="ideas" className="PrinciplesList section">
     <div className="section-heading">
-      <p className="eyebrow">Principles</p>
       <h2 className="section-title">Ideas I live by</h2>
     </div>
     <ol className="PrinciplesList-items">
@@ -15,10 +14,10 @@ const PrinciplesList = () => (
         <h3>Be a mental marathoner.</h3>
         <p className="PrinciplesList-body">
           Cars made running 42 km unnecessary, yet people still run marathons
-          because the effort is the point. AI is doing the same to thinking,
-          and I want to be one of the people who keeps doing it anyway. Whether
-          I’m writing or coding, I use AI for hints and sparring, not for
-          handing me conclusions.
+          because the effort is the point. AI is doing the same to thinking, and
+          I want to be one of the people who keeps doing it anyway. Whether I’m
+          writing or coding, I use AI for hints and sparring, not for handing me
+          conclusions.
         </p>
         <p className="PrinciplesList-source">
           Term from David Brooks,{" "}

@@ -8,25 +8,42 @@
   line-height: 1.65;
 }
 
+
+@keyframes rotate {
+  from {
+    rotate: 0deg;
+  }
+  
+  50% {
+    scale: 1 1.5;
+  }
+  
+  to {
+    rotate: 360deg;
+  }
+}
+
 /* Fixed to the viewport so the glow follows you down every page.
    (The pointer coordinates are viewport-relative too.) */
 #blob {
   background-color: white;
-  height: 20vmax;
+  /* --blob-size and --blob-opacity are set by the Now page's timeline, which
+     shrinks and dims the glow as you scroll back in time */
+  height: calc(34vmax * var(--blob-size, 1));
   aspect-ratio: 1;
   position: fixed;
   left: 50%;
   top: 50%;
   translate: -50% -50%;
   border-radius: 50%;
-  background: linear-gradient(to right, teal, white);
+  background: linear-gradient(to right, var(--cyan), var(--accent));
   animation: rotate 20s infinite;
-  opacity: 0.8;
+  opacity: var(--blob-opacity, 0.5);
 }
 
 #blur {
   position: fixed;
   inset: 0;
   z-index: 2;
-  backdrop-filter: blur(20vmax);
+  backdrop-filter: blur(12vmax);
 }

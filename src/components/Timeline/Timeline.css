@@ -1,0 +1,633 @@
+.Timeline-hint {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* ---------- Track: the line and its two columns ---------- */
+
+/* Two columns: the date on the left, the event on the right, with a vertical
+   line running between them for the full length of the page.
+   --when-w is the date column's width; --line-x is where the line sits. */
+.Timeline-track {
+  --when-w: 12.5rem;
+  --line-x: calc(var(--when-w) + 28px);
+  position: relative;
+}
+
+/* The line fades in at the top and runs down into the Big Bang */
+.Timeline-track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 20px;
+  left: var(--line-x);
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--line-strong) 80px);
+}
+
+.Timeline-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Era chapter headings ---------- */
+
+.Timeline-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--when-w) 1fr;
+  column-gap: 56px;
+  align-items: baseline;
+  padding: 24px 0 72px;
+}
+
+/* Diamond on the line, bigger than an entry's dot */
+.Timeline-card::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--line-x) - 7px);
+  top: calc(24px + 0.9em);
+  width: 15px;
+  height: 15px;
+  rotate: 45deg;
+  background: var(--bg);
+  border: 1.5px solid var(--accent);
+  box-sizing: border-box;
+}
+
+.Timeline-card-number {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent);
+  text-align: right;
+}
+
+.Timeline-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.Timeline-card-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 5.2vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.Timeline-card-subtitle {
+  font-size: 17px;
+  color: var(--text-muted);
+}
+
+/* ---------- Entries ---------- */
+
+.Timeline-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--when-w) 1fr;
+  column-gap: 56px;
+  align-items: baseline;
+}
+
+/* Dot on the line, level with the first line of text */
+.Timeline-row::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--line-x) - 4px);
+  top: 0.55em;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--cyan);
+  box-sizing: border-box;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Lights up once the entry has passed the middle of the window
+   (is-lit is toggled by useTimelineScroll) */
+.Timeline-row.is-lit::before {
+  background: var(--cyan);
+  box-shadow: 0 0 0 4px rgb(45 212 224 / 0.14), 0 0 14px var(--cyan);
+}
+
+.Timeline-when {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--cyan);
+  text-align: right;
+}
+
+.Timeline-what {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.Timeline-detail {
+  display: block;
+  margin-top: 8px;
+  max-width: 34rem;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+/* Entries and chapter headings start hidden and fade up into place as they
+   arrive. Only once the script is running (it adds is-animated), so nothing
+   stays invisible if it isn't. */
+.Timeline-track.is-animated .Timeline-row,
+.Timeline-track.is-animated .Timeline-card {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.Timeline-track.is-animated .Timeline-row.is-visible,
+.Timeline-track.is-animated .Timeline-card.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Gaps: the stretches of time between entries ---------- */
+
+/* Height is set in Timeline.js from how many years passed
+   (see timelineLayout.js) */
+.Timeline-gap {
+  position: relative;
+  padding: 70px 0;
+  box-sizing: border-box;
+}
+
+/* Ruler ticks along the line, fading out at both ends of the gap */
+.Timeline-gap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--line-x) - 4px);
+  width: 9px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--line-dashed) 0 1px,
+    transparent 1px 26px
+  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 60px, #000 calc(100% - 60px), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 60px, #000 calc(100% - 60px), transparent);
+}
+
+/* "↓ 54 years earlier". In a long gap it stays in the middle of the window
+   as you scroll, so there's always a reminder of how far you're travelling. */
+.Timeline-gap-label {
+  position: sticky;
+  top: 50vh;
+  z-index: 1;
+  width: fit-content;
+  margin-left: calc(var(--line-x) + 28px);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* Small symbols drifting in the gap; each era has its own set.
+   Two movements: a slow bob (the animation, on transform) and a slide
+   against the page as you scroll (parallax, on translate). --gap-scroll is
+   how far the gap's centre is from the middle of the window, set while
+   scrolling; --parallax is each glyph's own share of that. */
+.Timeline-glyph {
+  position: absolute;
+  font-family: var(--font-mono);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--text-muted);
+  opacity: var(--glyph-opacity);
+  pointer-events: none;
+  user-select: none;
+  translate: 0 calc(var(--gap-scroll, 0) * var(--parallax, 0) * 1px);
+  animation: timeline-drift ease-in-out infinite alternate;
+}
+
+.Timeline-glyph.is-tinted {
+  color: var(--cyan);
+}
+
+@keyframes timeline-drift {
+  from {
+    transform: translateY(calc(var(--glyph-drift) * -1));
+    opacity: calc(var(--glyph-opacity) * 0.35);
+  }
+  to {
+    transform: translateY(var(--glyph-drift));
+    opacity: var(--glyph-opacity);
+  }
+}
+
+/* ---------- The Big Bang: where the line ends ---------- */
+
+/* isolate keeps the burst behind this row's text but in front of the line */
+.Timeline-row.is-bang {
+  isolation: isolate;
+  padding-bottom: 40px;
+}
+
+.Timeline-row.is-bang .Timeline-what {
+  font-weight: 600;
+  font-size: clamp(1.7rem, 4.4vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.Timeline-row.is-bang::before {
+  background: #fff;
+  border-color: #fff;
+  box-shadow: 0 0 18px 4px rgb(255 255 255 / 0.8);
+}
+
+/* A zero-size anchor on the dot; the glow and rays are centred on it. Small
+   and faint until the entry reaches the middle of the window, then it bursts. */
+.Timeline-bang {
+  position: absolute;
+  left: var(--line-x);
+  top: 0.9em;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  opacity: 0.3;
+  scale: 0.45;
+  transition: opacity 1.4s ease, scale 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.Timeline-row.is-lit .Timeline-bang {
+  opacity: 1;
+  scale: 1;
+}
+
+.Timeline-bang::before,
+.Timeline-bang::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* Glow */
+.Timeline-bang::before {
+  width: 680px;
+  height: 680px;
+  left: -340px;
+  top: -340px;
+  background: radial-gradient(
+    circle,
+    #fff 0,
+    rgb(255 250 235 / 0.85) 3%,
+    rgb(45 212 224 / 0.4) 11%,
+    rgb(74 222 128 / 0.12) 28%,
+    transparent 60%
+  );
+  animation: bang-pulse 5s ease-in-out infinite alternate;
+}
+
+/* Rays, slowly turning */
+.Timeline-bang::after {
+  width: 1000px;
+  height: 1000px;
+  left: -500px;
+  top: -500px;
+  background: repeating-conic-gradient(
+    rgb(255 255 255 / 0.14) 0deg 1.5deg,
+    transparent 1.5deg 13deg
+  );
+  -webkit-mask-image: radial-gradient(circle, #000 4%, transparent 58%);
+  mask-image: radial-gradient(circle, #000 4%, transparent 58%);
+  animation: bang-turn 120s linear infinite;
+}
+
+@keyframes bang-pulse {
+  from {
+    transform: scale(0.93);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes bang-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- The void and the egg ---------- */
+
+/* Past the beginning of time: a tall, empty, dark stretch (the page
+   background fades to black here) with the egg alone near the bottom */
+.Timeline-void {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 150vh;
+  padding-bottom: 32vh;
+  box-sizing: border-box;
+}
+
+.Timeline-egg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 96px;
+  text-decoration: none;
+}
+
+.Timeline-egg-shape {
+  width: 52px;
+  height: 68px;
+  /* Narrower at the top, rounder at the bottom */
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 35% 30%, #fffdf5, #e9e2cf 60%, #c9c0a8);
+  box-shadow: 0 0 28px rgb(255 253 245 / 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Timeline-egg:hover .Timeline-egg-shape,
+.Timeline-egg:focus-visible .Timeline-egg-shape {
+  transform: rotate(-8deg) scale(1.08);
+  box-shadow: 0 0 44px rgb(255 253 245 / 0.55);
+}
+
+.Timeline-egg-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.Timeline-egg:hover .Timeline-egg-label {
+  color: var(--text);
+}
+
+/* ---------- Stars ---------- */
+
+/* Fixed behind the timeline's content. --star-opacity is set while
+   scrolling: 0 near the present, rising towards the beginning of time.
+   Each gradient is one star, repeated on its own tile size so the pattern
+   doesn't visibly repeat. */
+.Timeline-stars {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--star-opacity, 0);
+  background-image:
+    radial-gradient(1.2px 1.2px at 40px 60px, #fff, transparent),
+    radial-gradient(1px 1px at 150px 20px, rgb(255 255 255 / 0.8), transparent),
+    radial-gradient(1.5px 1.5px at 90px 170px, rgb(190 240 255 / 0.9), transparent),
+    radial-gradient(1px 1px at 230px 110px, rgb(255 255 255 / 0.7), transparent),
+    radial-gradient(1px 1px at 20px 250px, rgb(255 255 255 / 0.6), transparent),
+    radial-gradient(2px 2px at 300px 300px, rgb(255 245 220 / 0.9), transparent),
+    radial-gradient(1px 1px at 120px 330px, rgb(255 255 255 / 0.75), transparent),
+    radial-gradient(1.3px 1.3px at 410px 90px, rgb(200 255 230 / 0.8), transparent);
+  background-size:
+    211px 197px,
+    263px 241px,
+    317px 283px,
+    373px 331px,
+    293px 349px,
+    523px 467px,
+    431px 389px,
+    587px 409px;
+}
+
+/* ---------- Fixed controls (TimelineHud.js) ---------- */
+
+/* Shown only while the middle of the window is inside the timeline
+   (is-active) */
+.Timeline-readout,
+.Timeline-progress,
+.Timeline-top {
+  position: fixed;
+  z-index: 5;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+.Timeline-hud.is-active .Timeline-readout,
+.Timeline-hud.is-active .Timeline-progress,
+.Timeline-hud.is-active.is-deep .Timeline-top {
+  opacity: 1;
+  visibility: visible;
+}
+
+.Timeline-readout,
+.Timeline-top {
+  bottom: 24px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-mono);
+}
+
+/* "You are here": the moment in time at the middle of the window */
+.Timeline-readout {
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 10px 14px;
+  pointer-events: none;
+}
+
+.Timeline-readout-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.Timeline-readout-value {
+  min-height: 1.4em;
+  font-size: 15px;
+  line-height: 1.4;
+  /* Digits all the same width, so the box doesn't jitter as it counts */
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.Timeline-top {
+  right: 24px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.Timeline-top:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Era progress: one short vertical bar per era on the right edge. Each fills
+   as you scroll through its era (--fill, 0–1); click to jump to it. */
+.Timeline-progress {
+  right: 14px;
+  top: 50%;
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.Timeline-progress-era {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.Timeline-progress-bar {
+  position: relative;
+  width: 3px;
+  height: 44px;
+  border-radius: 2px;
+  background: var(--line-strong);
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.Timeline-progress-fill {
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(var(--fill, 0) * 100%);
+  background: var(--cyan);
+}
+
+.Timeline-progress-era.is-current .Timeline-progress-fill {
+  background: var(--accent);
+}
+
+/* Era names: the current one always, the rest when you point at the bar */
+.Timeline-progress-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.Timeline-progress:hover .Timeline-progress-name,
+.Timeline-progress-era:focus-visible .Timeline-progress-name,
+.Timeline-progress-era.is-current .Timeline-progress-name {
+  opacity: 1;
+}
+
+.Timeline-progress-era:hover .Timeline-progress-name,
+.Timeline-progress-era.is-current .Timeline-progress-name {
+  color: var(--text);
+}
+
+.Timeline-progress-era:hover .Timeline-progress-bar {
+  width: 5px;
+}
+
+/* ---------- Narrow screens ---------- */
+
+/* The date sits above its event, with the line on the left */
+@media (max-width: 640px) {
+  .Timeline-track {
+    --line-x: 4px;
+  }
+
+  .Timeline-row,
+  .Timeline-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 32px;
+  }
+
+  .Timeline-when,
+  .Timeline-card-number {
+    text-align: left;
+  }
+
+  .Timeline-card::before {
+    top: calc(24px + 0.3em);
+  }
+
+  .Timeline-gap-label {
+    margin-left: 32px;
+  }
+
+  /* No room for era names beside the content */
+  .Timeline-progress {
+    right: 2px;
+  }
+
+  .Timeline-progress-name {
+    display: none;
+  }
+
+  .Timeline-progress-bar {
+    height: 32px;
+  }
+
+  .Timeline-readout,
+  .Timeline-top {
+    bottom: 14px;
+  }
+
+  .Timeline-readout {
+    left: 14px;
+  }
+
+  .Timeline-top {
+    right: 14px;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .Timeline-egg-shape,
+  .Timeline-bang {
+    transition: none;
+  }
+
+  .Timeline-glyph,
+  .Timeline-bang::before,
+  .Timeline-bang::after {
+    animation: none;
+  }
+
+  /* No parallax, and entries appear in place instead of sliding up */
+  .Timeline-glyph {
+    translate: none;
+  }
+
+  .Timeline-track.is-animated .Timeline-row,
+  .Timeline-track.is-animated .Timeline-card {
+    transform: none;
+    transition: opacity 0.4s ease;
+  }
+}

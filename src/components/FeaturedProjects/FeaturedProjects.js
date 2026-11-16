@@ -24,7 +24,6 @@ const projects = [
 const FeaturedProjects = () => (
   <section id="work" className="FeaturedProjects section">
     <div className="section-heading">
-      <p className="eyebrow">Work</p>
       <h2 className="section-title">What I’ve been working on</h2>
     </div>
 

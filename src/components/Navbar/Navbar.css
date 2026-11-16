@@ -1,6 +1,9 @@
+/* Sticks to the top while scrolling. z-index 10 keeps it above the page
+   sections (z-index 3), which come later and would otherwise cover it. */
 .Navbar {
-  position: relative;
-  z-index: 3;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -10,23 +13,43 @@
   border-bottom: 1px solid var(--line);
 }
 
+/* Frosted backdrop stretching the full window width (the navbar itself is
+   only as wide as the page column), so content scrolling underneath fades
+   out behind it while the glow still shows through */
+.Navbar::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
 .Navbar-logo {
-  font-family: var(--font-mono);
-  font-size: 20px;
-  font-weight: 500;
-  text-decoration: none;
-  padding: 8px 12px;
-  border: 1.5px solid var(--accent);
+  display: block;
+  line-height: 0;
   border-radius: 8px;
-  line-height: 1.2;
 }
 
-.Navbar-logo-name {
-  color: var(--cyan);
-}
-
-.Navbar-logo-tld {
+/* About the same height as the old text logo; the 100px source keeps it
+   sharp on high-density screens */
+.Navbar-logo-img {
   color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 6dvh;
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.Navbar-logo:hover .Navbar-logo-img {
+  transform: scale(1.06);
 }
 
 .Navbar-links {
@@ -39,5 +62,5 @@
 
 .Navbar-links a {
   text-decoration: none;
-  padding: 12px 0;
+  padding: 8px 8px;
 }

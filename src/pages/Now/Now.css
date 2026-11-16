@@ -1,0 +1,256 @@
+/* position + z-index keep the page above the #blur layer (z-index 2) */
+.Now-intro {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 96px 0 56px;
+}
+
+.Now-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 4.6vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Three columns side by side, stacking when there isn't room */
+.Now-columns {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 56px 40px;
+  padding-bottom: 96px;
+}
+
+.Now-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Lets long titles truncate instead of widening the column */
+  min-width: 0;
+}
+
+.Now-column-title {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.Now-subtitle {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Loading, empty and error messages */
+.Now-note {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* Small "where this comes from" line at the bottom of a column */
+.Now-source {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.Now-source a,
+.Now-source a:hover {
+  color: var(--text-muted);
+}
+
+/* Shared by books and tracks: a title with a quieter line under it */
+.Now-item-title,
+.Now-item-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.Now-item-title {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.Now-item-meta {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+/* Goals */
+.Now-goal-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.Now-goals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 16px;
+  color: var(--text-soft);
+}
+
+.Now-goals li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.Now-goals li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+/* Reading */
+.Now-books,
+.Now-tracks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.Now-books {
+  gap: 20px;
+}
+
+.Now-book {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+}
+
+.Now-book-cover {
+  flex-shrink: 0;
+  width: 64px;
+  border-radius: 3px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.35);
+}
+
+.Now-book-text {
+  min-width: 0;
+}
+
+/* Book titles are worth reading in full: wrap instead of truncating */
+.Now-book .Now-item-title {
+  white-space: normal;
+}
+
+/* Listening */
+.Now-tracks {
+  gap: 4px;
+  margin: 0 -8px;
+}
+
+.Now-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.Now-track:hover,
+.Now-track.is-current {
+  background: var(--surface);
+}
+
+.Now-track.is-current .Now-item-title {
+  color: var(--accent);
+}
+
+/* The play/pause icon sits over the album art, shown on hover and on the
+   current track */
+.Now-track-art-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.Now-track-art {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 3px;
+  background: var(--surface);
+  object-fit: cover;
+}
+
+.Now-track-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.55);
+  color: var(--text);
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.Now-track:hover .Now-track-icon,
+.Now-track:focus-visible .Now-track-icon,
+.Now-track.is-current .Now-track-icon {
+  opacity: 1;
+}
+
+/* Spotify's player: collapsed until a track is played, then slides open */
+.Now-player {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.Now-player.is-open {
+  grid-template-rows: 1fr;
+}
+
+.Now-player > * {
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.Now-track-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.Now-track-time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
